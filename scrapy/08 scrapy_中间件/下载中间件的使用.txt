@@ -1,0 +1,50 @@
+要使用Scrapy中间件实现随机User Agent，首先需要创建一个下载器中间件，然后在该中间件中设置随机的User Agent。以下是实现随机User Agent的步骤：
+
+在Scrapy项目的middlewares.py文件中创建一个下载器中间件类，例如RandomUserAgentMiddleware。
+
+python
+import random
+
+class RandomUserAgentMiddleware:
+
+    def __init__(self, user_agent_list):
+        self.user_agent_list = user_agent_list
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        user_agent_list = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
+            'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.3',
+            # 添加更多User Agent
+        ]
+        return cls(user_agent_list)
+
+    def process_request(self, request, spider):
+        random_user_agent = random.choice(self.user_agent_list)
+        request.headers['User-Agent'] = random_user_agent
+在上面的代码中，我们创建了一个RandomUserAgentMiddleware类，并在__init__方法中初始化了一个User Agent列表。在from_crawler方法中，我们从crawler对象中获取User Agent列表，并将其传递给RandomUserAgentMiddleware类的实例。在process_request方法中，我们从User Agent列表中随机选择一个User Agent，并将其添加到请求头中。
+
+在Scrapy项目的settings.py文件中，将RandomUserAgentMiddleware添加到DOWNLOADER_MIDDLEWARES字典中。
+
+python
+DOWNLOADER_MIDDLEWARES = {
+    'myproject.middlewares.RandomUserAgentMiddleware': 543,
+}
+在上面的代码中，我们将RandomUserAgentMiddleware添加到DOWNLOADER_MIDDLEWARES字典中，并将其优先级设置为543。这个优先级数字越高，该中间件的执行顺序就越靠后。在本例中，我们将中间件的优先级设置为543，以确保它在其他中间件之后执行。
+
+现在，每次发送请求时，Scrapy都会从User Agent列表中随机选择一个User Agent，并将其添加到请求头中，从而实现随机User Agent的功能。
+
+下面汇总一些常用的User-Agent，简称UA。后续会持续补充，一行一个。
+
+1. Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36
+
+2. Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36
+
+3. Mozilla/5.0 (Windows NT 6.1; WOW64; rv:30.0) Gecko/20100101 Firefox/30.0
+
+4. Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/537.75.14
+
+5. Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Win64; x64; Trident/6.0)
+
+6. Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.63 Safari/537.36

@@ -1,0 +1,5 @@
+1.创建项目
+    scrapy startproject 项目名
+2.跳转到路径
+3.创建爬虫类
+    scrapy genspider -t crawl 爬虫名 爬取网站

@@ -1,0 +1,3 @@
+2023-10-02 22:02:53 [py.warnings] WARNING: D:\Python311\Lib\site-packages\scrapy\spidermiddlewares\offsite.py:74: URLWarning: allowed_domains accepts only domains, not URLs. Ignoring URL entry https://fanyi.baidu.com/sug in allowed_domains.
+  warnings.warn(message, URLWarning)
+

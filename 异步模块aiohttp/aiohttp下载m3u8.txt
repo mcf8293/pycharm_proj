@@ -1,0 +1,221 @@
+import aiohttp
+import base64
+from Crypto.Cipher import AES
+import os
+
+
+class M3U8TsDownloader:
+    def __init__(self, key, output_file):
+        self.key = key
+        self.output_file = output_file
+
+    async def download_and_save_ts_segments(self, m3u8_url):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(m3u8_url) as response:
+                if response.status == 200:
+                    m3u8_content = await response.text()
+                    ts_urls = self._extract_ts_urls(m3u8_content)
+                    await self._download_and_save_segments(ts_urls)
+                    self._merge_ts_segments()
+                else:
+                    raise ValueError(f"Failed to download m3u8 file: {response.status}")
+
+    def _extract_ts_urls(self, m3u8_content):
+        # 简单的提取方法，实际的提取方式可能因m3u8文件结构的不同而有所变化
+        ts_urls = []
+        for line in m3u8_content.splitlines():
+            if line.startswith('http') and line.endswith('.ts'):
+                ts_urls.append(line)
+        return ts_urls
+
+    async def _download_and_save_segments(self, ts_urls):
+        for url in ts_urls:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        encrypted_content = await response.read()
+                        decrypted_content = self._decrypt_video(encrypted_content)
+                        self._save_segment(decrypted_content)
+                    else:
+                        raise ValueError(f"Failed to download ts segment: {response.status}")
+
+    def _decrypt_video(self, encrypted_content):
+        cipher = AES.new(self.key, AES.MODE_CBC)
+        decrypted_content = cipher.decrypt(encrypted_content)
+        return decrypted_content
+
+    def _save_segment(self, content, segment_num=None):
+        # 将每个ts片段保存为单独的文件，文件名可以包含序号以避免覆盖
+        file_name = f"{self.output_file}_{segment_num}.ts" if segment_num else f"{self.output_file}.ts"
+        with open(file_name, 'wb') as file:
+            file.write(content)
+
+    def _merge_ts_segments(self):
+        # 使用命令行工具合并ts文件，例如使用ffmpeg
+        command = f"ffmpeg -i concat:{self.output_file}_*.ts -c copy {self.output_file}.mp4"
+        os.system(command)
+        # 删除单独的ts文件
+        for file in os.listdir('.'):
+            if file.startswith(f"{self.output_file}_") and file.endswith('.ts'):
+                os.remove(file)
+
+
+# 使用示例：
+async def main():
+    m3u8_url = 'your_encrypted_m3u8_url'
+    key = 'your_encryption_key'
+    output_file = 'output_video'
+    downloader = M3U8TsDownloader(key, output_file)
+    await downloader.download_and_save_ts_segments(m3u8_url)
+    print("TS片段已下载并保存，并已合并为一个完整的视频文件。")
+
+# 运行主函数
+asyncio.run(main())
+
+----------------------------------------------------------------
+
+import aiohttp
+import base64
+from Crypto.Cipher import AES
+import os
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
+
+class M3U8TsDownloader:
+    def __init__(self, key, output_file):
+        self.key = key
+        self.output_file = output_file
+
+    async def download_and_save_ts_segments(self, m3u8_url):
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(m3u8_url) as response:
+                    if response.status == 200:
+                        m3u8_content = await response.text()
+                        ts_urls = self._extract_ts_urls(m3u8_content)
+                        await self._download_and_save_segments(ts_urls)
+                        self._merge_ts_segments()
+                    else:
+                        raise ValueError(f"Failed to download m3u8 file: {response.status}")
+        except Exception as e:
+            logging.error(f"Error occurred: {str(e)}")
+            return
+
+    # ... [其他方法保持不变]
+
+    async def _download_and_save_segments(self, ts_urls):
+        try:
+            for i, url in enumerate(ts_urls):
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url) as response:
+                        if response.status == 200:
+                            encrypted_content = await response.read()
+                            decrypted_content = self._decrypt_video(encrypted_content)
+                            self._save_segment(decrypted_content, segment_num=i)
+                        else:
+                            raise ValueError(f"Failed to download ts segment {i}: {response.status}")
+        except Exception as e:
+            logging.error(f"Error occurred while downloading and saving segments: {str(e)}")
+            return
+
+    def _merge_ts_segments(self):
+        try:
+            # 使用命令行工具合并ts文件，例如使用ffmpeg
+            command = f"ffmpeg -i concat:{self.output_file}_*.ts -c copy {self.output_file}.mp4"
+            os.system(command)
+            # 删除单独的ts文件
+            for file in os.listdir('.'):
+                if file.startswith(f"{self.output_file}_") and file.endswith('.ts'):
+                    os.remove(file)
+        except Exception as e:
+            logging.error(f"Error occurred while merging ts segments: {str(e)}")
+            return
+        logging.info("TS片段已下载并保存，并已合并为一个完整的视频文件。")
+
+# 使用示例：
+async def main():
+    m3u8_url = 'your_encrypted_m3u8_url'
+    key = 'your_encryption_key'
+    output_file = 'output_video'
+    downloader = M3U8TsDownloader(key, output_file)
+    await downloader.download_and_save_ts_segments(m3u8_url)
+
+# 运行主函数
+asyncio.run(main())
+
+----------------------------------------------------------------
+----------------------------------------------------------------
+import aiohttp
+import base64
+from Crypto.Cipher import AES
+import os
+import logging
+import re
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
+
+class M3U8TsDownloader:
+    def __init__(self, key, output_dir):
+        self.key = key
+        self.output_dir = output_dir
+
+    async def download_and_save_ts_segments(self, m3u8_url):
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(m3u8_url) as response:
+                    if response.status == 200:
+                        m3u8_content = await response.text()
+                        titles = self._extract_titles(m3u8_content)
+                        ts_urls = self._extract_ts_urls(m3u8_content)
+                        for title, url in zip(titles, ts_urls):
+                            output_path = os.path.join(self.output_dir, title)
+                            if not os.path.exists(output_path):
+                                os.makedirs(output_path)
+                            await self._download_and_save_segment(url, output_path)
+                        self._merge_ts_segments(titles)
+                    else:
+                        raise ValueError(f"Failed to download m3u8 file: {response.status}")
+        except Exception as e:
+            logging.error(f"Error occurred: {str(e)}")
+            return
+
+    # ... [其他方法保持不变]
+
+    def _extract_titles(self, m3u8_content):
+        # 使用正则表达式提取视频标题
+        pattern = r'#EXTINF:.*?,(.*?)'
+        titles = re.findall(pattern, m3u8_content)
+        return titles
+
+    async def _download_and_save_segment(self, url, output_path):
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        encrypted_content = await response.read()
+                        decrypted_content = self._decrypt_video(encrypted_content)
+                        self._save_segment(decrypted_content, output_path)
+                    else:
+                        raise ValueError(f"Failed to download ts segment: {response.status}")
+        except Exception as e:
+            logging.error(f"Error occurred while downloading and saving segment: {str(e)}")
+            return
+
+    def _save_segment(self, content, output_path):
+        # 根据标题创建文件夹并保存TS片段
+        file_path = os.path.join(output_path, f'segment.ts')
+        with open(file_path, 'wb') as f:
+            f.write(content)
+
+    def _merge_ts_segments(self, titles):
+        for title in titles:
+            output_path = os.path.join(self.output_dir, title)
+            # 使用命令行工具合并ts文件，例如使用ffmpeg
+            command = f"ffmpeg -i concat:{output_path}/segment*.ts -c copy {output_path}/output.mp4"
+            os.system(command)
+            # 删除单独的ts文件
+            for file in os.listdir(output_path):
+                if file.startswith('segment') and file.endswith('.ts'):
+                    os.remove(os.path.join(output_path, file))
+            logging.info(f"TS片段已下载并保存，并已合并为一个完整的视频文件：{title}/output.mp4")

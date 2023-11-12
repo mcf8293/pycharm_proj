@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PYTHON_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/scrapy/01_scrapy入门/lottery" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/scrapy/02 scrapy管道之image/tupianzj" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/scrapy/02 scrapy_imagePipeline/pic" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/scrapy/03 test/pic" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/scrapy/04 scrapy_imagePipeline/pic" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/scrapy/05 scrapy_爬取当当网/dangdang_books" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/scrapy/06 scrapy_页面传参/dytt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/scrapy/07 scrapy_链接提取器/dushuproject" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/scrapy/09 scrapy_下载加密流媒体视频/streaming" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/scrapy/04 scrapy_图片之家下载图片/tupianzj" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/协程/img" />
+      <excludeFolder url="file://$MODULE_DIR$/03 bs4/img" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

@@ -1,0 +1,65 @@
+Scrapy是一个强大的Python爬虫框架，它提供了许多中间件来扩展爬虫的功能。以下是几个Scrapy爬虫中间件的例子：
+
+随机代理中间件
+有些网站会对爬虫进行封禁，为了避免被封禁，我们可以使用代理IP来隐藏爬虫的真实IP。Scrapy提供了一个随机代理中间件，可以在每次请求时随机选择一个代理IP。
+
+python
+import random
+
+class RandomProxyMiddleware:
+
+    def __init__(self, proxy_list):
+        self.proxy_list = proxy_list
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        proxy_list = [
+            {'http': 'http://proxy1.com:8080'},
+            {'http': 'http://proxy2.com:8080'},
+            # 添加更多代理IP
+        ]
+        return cls(proxy_list)
+
+    def process_request(self, request, spider):
+        random_proxy = random.choice(self.proxy_list)
+        request.meta['proxy'] = random_proxy
+在上面的代码中，我们创建了一个RandomProxyMiddleware类，并在__init__方法中初始化了一个代理IP列表。在from_crawler方法中，我们从crawler对象中获取代理IP列表，并将其传递给RandomProxyMiddleware类的实例。在process_request方法中，我们从代理IP列表中随机选择一个代理IP，并将其添加到请求头的meta字段中。
+
+重试中间件
+有些网站可能会对爬虫的请求进行限制，导致请求失败。为了避免这种情况，我们可以使用重试中间件，在请求失败时进行重试。
+
+python
+class RetryMiddleware:
+
+    def __init__(self, max_retry_times):
+        self.max_retry_times = max_retry_times
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(max_retry_times=3)
+
+    def process_exception(self, request, exception, spider):
+        if request.meta.get('retry_times', 0) < self.max_retry_times:
+            request.meta['retry_times'] = request.meta.get('retry_times', 0) + 1
+            request.dont_filter = True
+            return request
+在上面的代码中，我们创建了一个RetryMiddleware类，并在__init__方法中初始化了最大重试次数。在from_crawler方法中，我们将最大重试次数设置为3。在process_exception方法中，如果请求失败且重试次数小于最大重试次数，则增加重试次数并将请求重新加入调度队列。
+
+日志中间件
+为了方便调试和记录爬虫的运行情况，我们可以使用日志中间件来输出日志信息。
+
+python
+import logging
+
+class LogMiddleware:
+
+    def __init__(self, logger):
+        self.logger = logger
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(logger=crawler.logger)
+
+    def process_request(self, request, spider):
+        self.logger.info('Sending request: %s', request.url)
+```在上面的代码中，我们创建了一个`LogMiddleware`类，并在`__init__`方法中初始化了日志对象。在`from_crawler`方法中，我们从crawler对象中获取日志对象，并将其传递给`LogMiddleware`类的实例。在`process_request`方法中，我们输出正在发送的请求URL。
