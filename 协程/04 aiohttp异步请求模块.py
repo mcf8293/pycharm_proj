@@ -21,7 +21,7 @@ async def aiodownload(url):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
             with open("img/"+name,mode="wb") as f:
-                f.write(await resp.content.read()) # 读取内容是异步的. 需要await挂起, resp.text()
+                f.write(await resp.read()) # 读取内容是异步的. 需要await挂起, resp.text()
     print(name,"下载完成")
 
 
@@ -37,6 +37,6 @@ if __name__ == '__main__':
        raise RuntimeError('Event loop is closed')
 RuntimeError: Event loop is closed
     """
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     asyncio.run(main())
 
