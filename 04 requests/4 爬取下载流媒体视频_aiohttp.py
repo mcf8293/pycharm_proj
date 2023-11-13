@@ -29,7 +29,8 @@ async def main():
         info = re.findall(r'window.pageInfo = window.videoInfo = (.*?);', html_data)[0]
         json_data = json.loads(info)
         m3u8_url = \
-        json.loads(json_data['currentVideoInfo']['ksPlayJson'])['adaptationSet'][0]['representation'][0]['backupUrl'][0]
+            json.loads(json_data['currentVideoInfo']['ksPlayJson'])['adaptationSet'][0]['representation'][0][
+                'backupUrl'][0]
         m3u8_orginal = await get_response(session, m3u8_url)
         m3u8_data = re.sub('#E.*', '', m3u8_orginal)
         ts_list = m3u8_data.split()
